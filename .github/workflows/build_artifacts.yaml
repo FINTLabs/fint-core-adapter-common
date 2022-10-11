@@ -27,7 +27,7 @@ jobs:
         run: |
           gradle build --no-daemon
           mkdir data
-          cp ./build/libs/${GITHUB_REPOSITORY#*/}-*.jar ./data/app.jar
+          cp ./build/libs/${GITHUB_REPOSITORY#*/}*.jar ./data/app.jar
           echo "Branch: ${{ github.ref}}"
 
       - name: Upload a Build Artifact
