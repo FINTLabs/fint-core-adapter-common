@@ -70,21 +70,4 @@ public class OAuthConfiguration {
                 .responseTimeout(Duration.ofMinutes(10))
         );
     }
-
-    @Bean
-    public WebClient webClient(WebClient.Builder builder, ReactiveOAuth2AuthorizedClientManager authorizedClientManager, ClientHttpConnector clientHttpConnector) {
-        ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
-                .build();
-
-        ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Client = new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
-        oauth2Client.setDefaultClientRegistrationId(props.getRegistrationId());
-
-        return builder
-                .clientConnector(clientHttpConnector)
-                .exchangeStrategies(exchangeStrategies)
-                .filter(oauth2Client)
-                .baseUrl(props.getBaseUrl())
-                .build();
-    }
 }

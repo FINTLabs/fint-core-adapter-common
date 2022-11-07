@@ -9,14 +9,11 @@ import reactor.core.publisher.Mono;
 import javax.annotation.PostConstruct;
 
 @Slf4j
-@Service
 public class AdapterRegisterService {
-
 
     private final WebClient webClient;
     private final HeartbeatService heartbeatService;
     private final AdapterProperties props;
-
 
     public AdapterRegisterService(WebClient webClient, HeartbeatService heartbeatService, AdapterProperties props) {
         this.webClient = webClient;

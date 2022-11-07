@@ -8,9 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Service
 public class HeartbeatService {
-
 
     private final WebClient webClient;
     private final AdapterProperties props;
@@ -31,7 +29,6 @@ public class HeartbeatService {
         log.info("Stopped heartbeat service.");
         started = false;
     }
-
 
     @Scheduled(fixedRateString = "#{@adapterProperties.getHeartbeatIntervalMs()}")
     public void doHeartbeat() {
@@ -57,6 +54,4 @@ public class HeartbeatService {
             log.info("Heartbeat service is not started yet!");
         }
     }
-
-
 }
