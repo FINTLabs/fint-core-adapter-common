@@ -1,9 +1,6 @@
 package no.fintlabs.adapter;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import no.fintlabs.adapter.models.AdapterCapability;
 
 import java.time.Duration;
@@ -11,11 +8,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdapterProperties {
+public class AdapterInstanceProperties {
 
     private int heartbeatInterval;
     private String id;

@@ -22,12 +22,12 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         implements Subscriber<List<T>> {
 
     private final WebClient webClient;
-    protected final AdapterProperties adapterProperties;
+    protected final AdapterInstanceProperties adapterInstanceProperties;
 
 
-    protected ResourceSubscriber(WebClient webClient, AdapterProperties adapterProperties, P publisher) {
+    protected ResourceSubscriber(WebClient webClient, AdapterInstanceProperties adapterInstanceProperties, P publisher) {
         this.webClient = webClient;
-        this.adapterProperties = adapterProperties;
+        this.adapterInstanceProperties = adapterInstanceProperties;
 
         publisher.subscribe(this);
     }
@@ -86,8 +86,8 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
             pages.add(FullSyncPage.<T>builder()
                     .resources(entries)
                     .metadata(SyncPageMetadata.builder()
-                            .orgId(adapterProperties.getOrgId())
-                            .adapterId(adapterProperties.getId())
+                            .orgId(adapterInstanceProperties.getOrgId())
+                            .adapterId(adapterInstanceProperties.getId())
                             .corrId(corrId)
                             .totalPages((size + pageSize - 1) / pageSize)
                             .totalSize(size)

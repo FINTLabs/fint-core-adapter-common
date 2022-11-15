@@ -1,35 +1,57 @@
 package no.fintlabs.adapter;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class AdapterServiceFactory {
 
-    private final MultipleAdapterProperties multipleAdapterProperties;
+    private final AdapterCollectionProperties multipleAdapterCollectionProperties;
 
     private final WebClientFactory webClientFactory;
 
-    private List<AdapterRegisterService> registerServices;
+    private final GenericApplicationContext genericApplicationContext;
 
-    public AdapterServiceFactory(MultipleAdapterProperties multipleAdapterProperties, WebClientFactory webClientFactory) {
-        this.multipleAdapterProperties = multipleAdapterProperties;
+    public AdapterServiceFactory(AdapterCollectionProperties multipleAdapterCollectionProperties, WebClientFactory webClientFactory, GenericApplicationContext genericApplicationContext) {
+        this.multipleAdapterCollectionProperties = multipleAdapterCollectionProperties;
         this.webClientFactory = webClientFactory;
-        registerServices = new ArrayList<>();
-    }
+        this.genericApplicationContext = genericApplicationContext;
 
-    @PostConstruct
-    private void startUpServices() {
-        for (var adapterProperties : multipleAdapterProperties.getAdapters().entrySet()) {
+        if (multipleAdapterCollectionProperties.getAdapter().size() == 0)
+            throw new IllegalArgumentException("No entry for fint.adapter found");
 
-            AdapterProperties props = adapterProperties.getValue();
+        for (var adapterProperties : multipleAdapterCollectionProperties.getAdapter().entrySet()) {
+
+            validate(adapterProperties.getValue(), adapterProperties.getKey());
+
+            AdapterInstanceProperties props = adapterProperties.getValue();
             HeartbeatService heartbeatService = new HeartbeatService(webClientFactory.webClient(props), props);
             AdapterRegisterService adapterRegisterService = new AdapterRegisterService(webClientFactory.webClient(props), heartbeatService, props);
-            registerServices.add(adapterRegisterService);
+            registerAdapterService("register-service-" + adapterProperties.getKey(), adapterRegisterService);
+
+            registerAdapterProperties(adapterProperties.getKey(), props);
         }
+    }
+
+    private void registerAdapterProperties(String beanQualifier, AdapterInstanceProperties props) {
+        genericApplicationContext.registerBean(
+                beanQualifier,
+                AdapterInstanceProperties.class,
+                () -> props
+        );
+    }
+
+    private void registerAdapterService(String beanQualifier, AdapterRegisterService adapterRegisterService) {
+        genericApplicationContext.registerBean(
+                beanQualifier,
+                AdapterRegisterService.class,
+                () -> adapterRegisterService
+        );
+    }
+
+    private void validate(AdapterInstanceProperties props, String entryKey){
+        if (StringUtils.isEmpty(props.getId())) throw new IllegalArgumentException("AdapterProperties for " + entryKey + " is missing id.");
     }
 
 }

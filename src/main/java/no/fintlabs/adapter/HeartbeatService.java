@@ -3,7 +3,6 @@ package no.fintlabs.adapter;
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.adapter.models.AdapterHeartbeat;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -11,11 +10,11 @@ import reactor.core.publisher.Mono;
 public class HeartbeatService {
 
     private final WebClient webClient;
-    private final AdapterProperties props;
+    private final AdapterInstanceProperties props;
 
     private boolean started;
 
-    public HeartbeatService(WebClient webClient, AdapterProperties props) {
+    public HeartbeatService(WebClient webClient, AdapterInstanceProperties props) {
         this.webClient = webClient;
         this.props = props;
     }
@@ -30,7 +29,7 @@ public class HeartbeatService {
         started = false;
     }
 
-    @Scheduled(fixedRateString = "#{@adapterProperties.getHeartbeatIntervalMs()}")
+    @Scheduled(fixedRateString = "#{props.getHeartbeatIntervalMs()}")
     public void doHeartbeat() {
 
         if (started) {
