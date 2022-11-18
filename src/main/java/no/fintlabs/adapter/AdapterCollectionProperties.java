@@ -12,10 +12,10 @@ import java.util.Map;
 public class AdapterCollectionProperties {
 
     public AdapterCollectionProperties() {
-        adapter = new HashMap<String, AdapterInstanceProperties>();
+        adapter = new HashMap<String, AdapterProperties>();
     }
 
     @Getter
-    private Map<String, AdapterInstanceProperties> adapter;
+    private Map<String, AdapterProperties> adapter;
 
 }

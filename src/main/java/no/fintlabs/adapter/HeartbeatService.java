@@ -10,11 +10,11 @@ import reactor.core.publisher.Mono;
 public class HeartbeatService {
 
     private final WebClient webClient;
-    private final AdapterInstanceProperties props;
+    private final AdapterProperties props;
 
     private boolean started;
 
-    public HeartbeatService(WebClient webClient, AdapterInstanceProperties props) {
+    public HeartbeatService(WebClient webClient, AdapterProperties props) {
         this.webClient = webClient;
         this.props = props;
     }

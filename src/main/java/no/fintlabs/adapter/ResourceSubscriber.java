@@ -22,18 +22,19 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         implements Subscriber<List<T>> {
 
     private final WebClient webClient;
-    protected final AdapterInstanceProperties adapterInstanceProperties;
+    protected final AdapterProperties adapterProperties;
 
 
-    protected ResourceSubscriber(WebClient webClient, AdapterInstanceProperties adapterInstanceProperties, P publisher) {
+    protected ResourceSubscriber(WebClient webClient, AdapterProperties adapterProperties, P publisher) {
         this.webClient = webClient;
-        this.adapterInstanceProperties = adapterInstanceProperties;
+        this.adapterProperties = adapterProperties;
 
         publisher.subscribe(this);
     }
 
     public void onSync(List<T> resources) {
         log.info("Syncing {} items to endpoint {}", resources.size(), getCapability().getEntityUri());
+        log.info("Syncing with {} for {}", adapterProperties.getRegistrationId(), webClient.hashCode());
 
         int pageSize = 100;
         Instant start = Instant.now();
@@ -86,8 +87,8 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
             pages.add(FullSyncPage.<T>builder()
                     .resources(entries)
                     .metadata(SyncPageMetadata.builder()
-                            .orgId(adapterInstanceProperties.getOrgId())
-                            .adapterId(adapterInstanceProperties.getId())
+                            .orgId(adapterProperties.getOrgId())
+                            .adapterId(adapterProperties.getId())
                             .corrId(corrId)
                             .totalPages((size + pageSize - 1) / pageSize)
                             .totalSize(size)

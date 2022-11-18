@@ -9,12 +9,12 @@ import java.util.concurrent.SubmissionPublisher;
 public abstract class ResourcePublisher<T extends FintLinks, R extends ResourceRepository<T>> extends SubmissionPublisher<List<T>> {
 
     protected final R repository;
-    protected final AdapterInstanceProperties adapterInstanceProperties;
+    protected final AdapterProperties adapterProperties;
 
 
-    public ResourcePublisher(R repository, AdapterInstanceProperties adapterInstanceProperties) {
+    public ResourcePublisher(R repository, AdapterProperties adapterProperties) {
         this.repository = repository;
-        this.adapterInstanceProperties = adapterInstanceProperties;
+        this.adapterProperties = adapterProperties;
     }
 
     public abstract void doFullSync();

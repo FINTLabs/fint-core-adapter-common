@@ -1,9 +1,11 @@
 package no.fintlabs.adapter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AdapterServiceFactory {
 
@@ -25,19 +27,21 @@ public class AdapterServiceFactory {
 
             validate(adapterProperties.getValue(), adapterProperties.getKey());
 
-            AdapterInstanceProperties props = adapterProperties.getValue();
+            AdapterProperties props = adapterProperties.getValue();
             HeartbeatService heartbeatService = new HeartbeatService(webClientFactory.webClient(props), props);
             AdapterRegisterService adapterRegisterService = new AdapterRegisterService(webClientFactory.webClient(props), heartbeatService, props);
             registerAdapterService("register-service-" + adapterProperties.getKey(), adapterRegisterService);
+            log.info("Registert adapter service: " + adapterProperties.getKey());
 
             registerAdapterProperties(adapterProperties.getKey(), props);
+            log.info("Register adapter properties: " + adapterProperties.getKey());
         }
     }
 
-    private void registerAdapterProperties(String beanQualifier, AdapterInstanceProperties props) {
+    private void registerAdapterProperties(String beanQualifier, AdapterProperties props) {
         genericApplicationContext.registerBean(
                 beanQualifier,
-                AdapterInstanceProperties.class,
+                AdapterProperties.class,
                 () -> props
         );
     }
@@ -50,7 +54,7 @@ public class AdapterServiceFactory {
         );
     }
 
-    private void validate(AdapterInstanceProperties props, String entryKey){
+    private void validate(AdapterProperties props, String entryKey){
         if (StringUtils.isEmpty(props.getId())) throw new IllegalArgumentException("AdapterProperties for " + entryKey + " is missing id.");
     }
 

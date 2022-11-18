@@ -12,9 +12,9 @@ public class AdapterRegisterService {
 
     private final WebClient webClient;
     private final HeartbeatService heartbeatService;
-    private final AdapterInstanceProperties props;
+    private final AdapterProperties props;
 
-    public AdapterRegisterService(WebClient webClient, HeartbeatService heartbeatService, AdapterInstanceProperties props) {
+    public AdapterRegisterService(WebClient webClient, HeartbeatService heartbeatService, AdapterProperties props) {
         this.webClient = webClient;
         this.heartbeatService = heartbeatService;
         this.props = props;

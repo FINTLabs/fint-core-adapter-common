@@ -21,7 +21,7 @@ public class WebClientFactory {
     private final ReactiveClientRegistrationRepository clientRegistrationRepository;
     private final ReactiveOAuth2AuthorizedClientService authorizedClientService;
 
-    public WebClient webClient(AdapterInstanceProperties props) {
+    public WebClient webClient(AdapterProperties props) {
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
                 .build();
@@ -38,7 +38,7 @@ public class WebClientFactory {
                 .build();
     }
 
-    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(AdapterInstanceProperties props) {
+    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(AdapterProperties props) {
 
         ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider = ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
                 .password()
