@@ -15,8 +15,8 @@ public class AdapterProperties {
 
     private int heartbeatInterval;
     private String id;
-//    private String username;
-//    private String password;
+    private String username;
+    private String password;
     private String registrationId;
     private String baseUrl;
     private String orgId;

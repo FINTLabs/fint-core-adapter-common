@@ -18,9 +18,11 @@ public class AdapterRegisterService {
         this.webClient = webClient;
         this.heartbeatService = heartbeatService;
         this.props = props;
+
+        init();
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void init() {
 
         AdapterContract adapterContract = AdapterContract.builder()

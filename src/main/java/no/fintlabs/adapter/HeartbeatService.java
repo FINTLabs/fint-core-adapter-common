@@ -29,7 +29,7 @@ public class HeartbeatService {
         started = false;
     }
 
-    @Scheduled(fixedRateString = "#{props.getHeartbeatIntervalMs()}")
+    @Scheduled(fixedRateString = "60000")
     public void doHeartbeat() {
 
         if (started) {
