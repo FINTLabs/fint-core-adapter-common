@@ -2,29 +2,27 @@ package no.fintlabs.adapter;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.adapter.models.AdapterContract;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
 @Slf4j
-@Service
 public class AdapterRegisterService {
-
 
     private final WebClient webClient;
     private final HeartbeatService heartbeatService;
     private final AdapterProperties props;
 
-
     public AdapterRegisterService(WebClient webClient, HeartbeatService heartbeatService, AdapterProperties props) {
         this.webClient = webClient;
         this.heartbeatService = heartbeatService;
         this.props = props;
+
+        init();
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void init() {
 
         AdapterContract adapterContract = AdapterContract.builder()

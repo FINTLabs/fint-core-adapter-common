@@ -1,24 +1,16 @@
 package no.fintlabs.adapter;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import no.fintlabs.adapter.models.AdapterCapability;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Configuration
-@ConfigurationProperties(prefix = "fint.adapter")
 public class AdapterProperties {
 
     private int heartbeatInterval;
@@ -34,6 +26,7 @@ public class AdapterProperties {
     public Set<AdapterCapability> adapterCapabilityToSet() {
         return new HashSet<>(capabilities.values());
     }
+
     public long getHeartbeatIntervalMs() {
         return Duration.parse("PT" + heartbeatInterval + "M").toMillis();
     }

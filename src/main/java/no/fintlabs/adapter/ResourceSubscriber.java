@@ -34,6 +34,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
     public void onSync(List<T> resources) {
         log.info("Syncing {} items to endpoint {}", resources.size(), getCapability().getEntityUri());
+        log.info("Syncing with {} for {}", adapterProperties.getRegistrationId(), webClient.hashCode());
 
         int pageSize = 100;
         Instant start = Instant.now();

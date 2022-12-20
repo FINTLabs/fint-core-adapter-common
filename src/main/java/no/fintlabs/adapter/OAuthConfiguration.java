@@ -20,40 +20,8 @@ import reactor.netty.resources.ConnectionProvider;
 import java.time.Duration;
 import java.util.Map;
 
-@Slf4j
-@Getter
-@Setter
 @Configuration
 public class OAuthConfiguration {
-    private final AdapterProperties props;
-
-    public OAuthConfiguration(AdapterProperties props) {
-        this.props = props;
-    }
-
-    @Bean
-    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(
-            ReactiveClientRegistrationRepository clientRegistrationRepository,
-            ReactiveOAuth2AuthorizedClientService authorizedClientService) {
-
-        ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider = ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
-                .password()
-                .refreshToken()
-                .build();
-
-        AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
-                clientRegistrationRepository,
-                authorizedClientService
-        );
-
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-        authorizedClientManager.setContextAttributesMapper(oAuth2AuthorizeRequest -> Mono.just(Map.of(
-                OAuth2AuthorizationContext.USERNAME_ATTRIBUTE_NAME, props.getUsername(),
-                OAuth2AuthorizationContext.PASSWORD_ATTRIBUTE_NAME, props.getPassword()
-        )));
-
-        return authorizedClientManager;
-    }
 
     @Bean
     public ClientHttpConnector clientHttpConnector() {
@@ -69,22 +37,5 @@ public class OAuthConfiguration {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 900000)
                 .responseTimeout(Duration.ofMinutes(10))
         );
-    }
-
-    @Bean
-    public WebClient webClient(WebClient.Builder builder, ReactiveOAuth2AuthorizedClientManager authorizedClientManager, ClientHttpConnector clientHttpConnector) {
-        ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
-                .build();
-
-        ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2Client = new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
-        oauth2Client.setDefaultClientRegistrationId(props.getRegistrationId());
-
-        return builder
-                .clientConnector(clientHttpConnector)
-                .exchangeStrategies(exchangeStrategies)
-                .filter(oauth2Client)
-                .baseUrl(props.getBaseUrl())
-                .build();
     }
 }
