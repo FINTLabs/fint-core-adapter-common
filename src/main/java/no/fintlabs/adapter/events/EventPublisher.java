@@ -1,6 +1,7 @@
 package no.fintlabs.adapter.events;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.AdapterProperties;
@@ -16,20 +17,20 @@ import java.util.concurrent.SubmissionPublisher;
 @Slf4j
 public abstract class EventPublisher<T extends FintLinks> extends SubmissionPublisher<ResponseFintEvent<T>> {
 
-    private final ResourceConverter resourceConverter;
-    private final WebClient webClient;
     protected final AdapterProperties adapterProperties;
+    protected final WriteableResourceRepository<T> repository;
+    private final WebClient webClient;
     private final String capabilityKey;
     private final Class<T> classOfT;
-    protected final WriteableResourceRepository<T> repository;
+    private final ObjectMapper objectMapper;
 
-    protected EventPublisher(String capabilityKey, Class<T> classOfT, ResourceConverter resourceConverter, WebClient webClient, AdapterProperties adapterProperties, WriteableResourceRepository<T> repository) {
+    protected EventPublisher(String capabilityKey, Class<T> classOfT, WebClient webClient, AdapterProperties adapterProperties, WriteableResourceRepository<T> repository, ObjectMapper objectMapper) {
         this.classOfT = classOfT;
         this.capabilityKey = capabilityKey;
-        this.resourceConverter = resourceConverter;
         this.webClient = webClient;
         this.adapterProperties = adapterProperties;
         this.repository = repository;
+        this.objectMapper = objectMapper;
     }
 
     public abstract void doCheckForNewEvents();
@@ -67,7 +68,7 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
         body.forEach(requestEvent -> {
 
             try {
-                T resource = resourceConverter.from(requestEvent.getValue(), classOfT);
+                T resource = (T) objectMapper.readValue(requestEvent.getValue(), classOfT);
                 handleEvent(requestEvent, resource);
             } catch (JsonProcessingException e) {
                 // TODO: 21/12/2022 Handle error?
