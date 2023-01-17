@@ -9,10 +9,10 @@ fint:
     org-id: fintlabs.no
     heartbeat-interval: 1
     capabilities:
-      fravar:
+      elevfravar:
         domain-name: utdanning
         package-name: vurdering
-        resource-name: fravar
+        resource-name: elevfravar
         fullSyncIntervalInDays: 7
         deltaSyncInterval: IMMEDIATE
       fravarsoversikt:
