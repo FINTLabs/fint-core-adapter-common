@@ -8,19 +8,13 @@ fint:
     registration-id: fint
     org-id: fintlabs.no
     heartbeat-interval: 1
-    capabilities:
-      elevfravar:
-        domain-name: utdanning
-        package-name: vurdering
-        resource-name: elevfravar
-        fullSyncIntervalInDays: 7
-        deltaSyncInterval: IMMEDIATE
-      fravarsoversikt:
-        domain-name: utdanning
-        packageName: vurdering
-        resource-name: fravarsoversikt
-        fullSyncIntervalInDays: 7
-        deltaSyncInterval: IMMEDIATE
+#    capabilities:
+#      elevfravar:
+#        domain-name: utdanning
+#        package-name: vurdering
+#        resource-name: elevfravar
+#        fullSyncIntervalInDays: 7
+#        deltaSyncInterval: IMMEDIATE
 
 spring:
   security:
@@ -36,6 +30,3 @@ spring:
             client-secret:
             provider: fint-idp
             scope: fint-adapter
-
-
-
