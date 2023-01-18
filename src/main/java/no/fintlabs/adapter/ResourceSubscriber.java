@@ -3,6 +3,7 @@ package no.fintlabs.adapter;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.models.*;
+import no.fintlabs.adapter.validator.ValidatorService;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,12 +23,14 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         implements Subscriber<List<T>> {
 
     private final WebClient webClient;
+    private final ValidatorService validatorService;
     protected final AdapterProperties adapterProperties;
 
 
-    protected ResourceSubscriber(WebClient webClient, AdapterProperties adapterProperties, P publisher) {
+    protected ResourceSubscriber(WebClient webClient, AdapterProperties adapterProperties, P publisher, ValidatorService validatorService) {
         this.webClient = webClient;
         this.adapterProperties = adapterProperties;
+        this.validatorService = validatorService;
 
         publisher.subscribe(this);
     }
@@ -98,6 +101,10 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                             .build()
                     )
                     .build());
+        }
+
+        if (adapterProperties.isDebug()) {
+            // Todo validate pages
         }
 
         return pages;

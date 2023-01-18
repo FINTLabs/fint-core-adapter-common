@@ -1,5 +1,6 @@
 fint:
   adapter:
+    debug: false
     id: https://vigoiks.no/fintlabs-no/utdanning/vurdering
     password:
     username:
