@@ -104,7 +104,12 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         }
 
         if (adapterProperties.isDebug()) {
-            // Todo validate pages
+            if (validatorService.totalSizeIsNotValid(pages, resources.size()))
+                log.warn("page size does not match resources sieze!");
+            if (validatorService.duplicateIds(pages))
+                log.warn("Duplicate ids found!");
+            if (validatorService.notValidIds(pages))
+                log.warn("One or more Id's is not valid");
         }
 
         return pages;
