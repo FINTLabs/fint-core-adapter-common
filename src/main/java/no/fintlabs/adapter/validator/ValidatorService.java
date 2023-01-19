@@ -43,14 +43,14 @@ public class ValidatorService {
                 .count();
     }
 
-    public <T extends FintLinks> boolean validIds(List<SyncPage<T>> pages) {
+    public <T extends FintLinks> boolean IdsIsValid(List<SyncPage<T>> pages) {
         return pages.stream()
                 .flatMap(p -> p.getResources().stream())
                 .allMatch(r -> URLEncoder.encode(r.getIdentifier(), StandardCharsets.UTF_8)
                         .length() == r.getIdentifier().length());
     }
 
-    public <T extends FintLinks> boolean notValidIds(List<SyncPage<T>> pages) {
+    public <T extends FintLinks> boolean IdsIsNotValid(List<SyncPage<T>> pages) {
         return pages.stream()
                 .flatMap(p -> p.getResources().stream())
                 .allMatch(r -> URLEncoder.encode(r.getIdentifier(), StandardCharsets.UTF_8)

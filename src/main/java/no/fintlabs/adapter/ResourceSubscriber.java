@@ -105,10 +105,10 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
         if (adapterProperties.isDebug()) {
             if (validatorService.totalSizeIsNotValid(pages, resources.size()))
-                log.warn("page size does not match resources sieze!");
+                log.warn("page size does not match resources size!");
             if (validatorService.duplicateIds(pages))
                 log.warn("Duplicate ids found!");
-            if (validatorService.notValidIds(pages))
+            if (validatorService.IdsIsNotValid(pages))
                 log.warn("One or more Id's is not valid");
         }
 
