@@ -6,8 +6,6 @@ import no.fintlabs.adapter.models.SyncPage;
 import no.fintlabs.adapter.models.SyncPageEntry;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,14 +33,17 @@ public class ValidatorService<T extends FintLinks> {
     }
 
     public boolean hasDuplicateIds(List<SyncPage<T>> pages) {
-        return pages.stream()
+        int uniqueIdCount = pages.stream()
                 .flatMap(p -> p.getResources().stream())
                 .map(SyncPageEntry::getIdentifier)
-                .collect(Collectors.toSet())
-                .size() != pages.stream()
+                .collect(Collectors.toSet()).size();
+
+        long idCount = pages.stream()
                 .flatMap(p -> p.getResources().stream())
                 .map(SyncPageEntry::getIdentifier)
                 .count();
+
+        return uniqueIdCount != idCount;
     }
 
     public boolean validIds(List<SyncPage<T>> pages) {
