@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Flow;
 import java.util.stream.Collectors;
 
@@ -74,10 +75,10 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     public List<SyncPage<T>> getPages(List<T> resources, int pageSize) {
 
         List<SyncPage<T>> pages = new ArrayList<>();
-        int size = resources.size();
+        int totalSize = resources.size();
         String corrId = UUID.randomUUID().toString();
 
-        for (int i = 0; i < size; i += pageSize) {
+        for (int i = 0; i < totalSize; i += pageSize) {
             int end = Math.min((i + pageSize), resources.size());
 
             List<SyncPageEntry<T>> entries = resources
@@ -92,8 +93,8 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                             .orgId(adapterProperties.getOrgId())
                             .adapterId(adapterProperties.getId())
                             .corrId(corrId)
-                            .totalPages((size + pageSize - 1) / pageSize)
-                            .totalSize(size)
+                            .totalPages((totalSize + pageSize - 1) / pageSize)
+                            .totalSize(totalSize)
                             .pageSize(entries.size())
                             .page((i / pageSize) + 1)
                             .uriRef(getCapability().getEntityUri())
@@ -104,12 +105,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         }
 
         if (adapterProperties.isDebug()) {
-            if (validatorService.totalSizeIsNotValid(pages, resources.size()))
-                log.warn("page size does not match resources size!");
-            if (validatorService.duplicateIds(pages))
-                log.warn("Duplicate ids found!");
-            if (validatorService.IdsIsNotValid(pages))
-                log.warn("One or more Id's is not valid");
+            validatorService.validate(pages, totalSize);
         }
 
         return pages;
