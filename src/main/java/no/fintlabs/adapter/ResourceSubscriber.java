@@ -3,6 +3,7 @@ package no.fintlabs.adapter;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.models.*;
+import no.fintlabs.adapter.validator.ValidatorService;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,12 +23,14 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         implements Subscriber<List<T>> {
 
     private final WebClient webClient;
+    private final ValidatorService validatorService;
     protected final AdapterProperties adapterProperties;
 
 
-    protected ResourceSubscriber(WebClient webClient, AdapterProperties adapterProperties, P publisher) {
+    protected ResourceSubscriber(WebClient webClient, AdapterProperties adapterProperties, P publisher, ValidatorService validatorService) {
         this.webClient = webClient;
         this.adapterProperties = adapterProperties;
+        this.validatorService = validatorService;
 
         publisher.subscribe(this);
     }
@@ -71,10 +74,10 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     public List<SyncPage<T>> getPages(List<T> resources, int pageSize) {
 
         List<SyncPage<T>> pages = new ArrayList<>();
-        int size = resources.size();
+        int totalSize = resources.size();
         String corrId = UUID.randomUUID().toString();
 
-        for (int i = 0; i < size; i += pageSize) {
+        for (int i = 0; i < totalSize; i += pageSize) {
             int end = Math.min((i + pageSize), resources.size());
 
             List<SyncPageEntry<T>> entries = resources
@@ -89,8 +92,8 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                             .orgId(adapterProperties.getOrgId())
                             .adapterId(adapterProperties.getId())
                             .corrId(corrId)
-                            .totalPages((size + pageSize - 1) / pageSize)
-                            .totalSize(size)
+                            .totalPages((totalSize + pageSize - 1) / pageSize)
+                            .totalSize(totalSize)
                             .pageSize(entries.size())
                             .page((i / pageSize) + 1)
                             .uriRef(getCapability().getEntityUri())
@@ -98,6 +101,10 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                             .build()
                     )
                     .build());
+        }
+
+        if (adapterProperties.isDebug()) {
+            validatorService.validate(pages, totalSize);
         }
 
         return pages;

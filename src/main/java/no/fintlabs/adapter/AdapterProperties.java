@@ -28,6 +28,7 @@ public class AdapterProperties {
     private String registrationId;
     private String baseUrl;
     private String orgId;
+    private boolean debug;
 
     private Map<String, AdapterCapability> capabilities;
 
