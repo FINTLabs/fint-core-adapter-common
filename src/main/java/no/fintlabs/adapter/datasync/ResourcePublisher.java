@@ -1,6 +1,7 @@
-package no.fintlabs.adapter;
+package no.fintlabs.adapter.datasync;
 
 import no.fint.model.resource.FintLinks;
+import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterCapability;
 
 import java.util.List;

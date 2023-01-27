@@ -1,4 +1,4 @@
-package no.fintlabs.adapter;
+package no.fintlabs.adapter.config;
 
 import io.netty.channel.ChannelOption;
 import lombok.Getter;
