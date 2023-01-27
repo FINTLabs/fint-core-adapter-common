@@ -35,8 +35,10 @@ public abstract class EventSubscriber<T extends FintLinks, P extends EventPublis
                 .body(Mono.just(responseFintEvent), ResponseFintEvent.class)
                 .retrieve()
                 .toBodilessEntity()
-                .doOnError(e -> log.error("Posting response to event failed", e))
-                .doOnNext(response -> responsePostingEvent(response, responseFintEvent));
+                .subscribe(
+                        response -> responsePostingEvent(response, responseFintEvent),
+                        e -> log.error("Posting response to event failed. Corr-id: " + responseFintEvent.getCorrId(), e)
+                );
     }
 
     protected abstract void responsePostingEvent(ResponseEntity<Void> response, ResponseFintEvent<T> responseFintEvent);
