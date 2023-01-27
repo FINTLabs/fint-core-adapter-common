@@ -1,7 +1,8 @@
-package no.fintlabs.adapter;
+package no.fintlabs.adapter.datasync;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
+import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.*;
 import no.fintlabs.adapter.validator.ValidatorService;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,7 +21,7 @@ import static java.util.concurrent.Flow.Subscriber;
 
 @Slf4j
 public abstract class ResourceSubscriber<T extends FintLinks, P extends ResourcePublisher<T, ResourceRepository<T>>>
-        implements Subscriber<List<T>> {
+        implements Subscriber<SyncData<T>> {
 
     private final WebClient webClient;
     private final ValidatorService validatorService;
@@ -35,14 +36,14 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         publisher.subscribe(this);
     }
 
-    public void onSync(List<T> resources) {
-        log.info("Syncing {} items to endpoint {}", resources.size(), getCapability().getEntityUri());
+    public void onSync(SyncData<T> syncData) {
+        log.info("Syncing {} items to endpoint {}", syncData.getResources().size(), getCapability().getEntityUri());
 
         int pageSize = 100;
         Instant start = Instant.now();
-        Flux.fromIterable(getPages(resources, pageSize))
-                .flatMap(this::post)
-                .doOnComplete(() -> logDuration(resources.size(), pageSize, start))
+        Flux.fromIterable(getPages(syncData.getResources(), pageSize))
+                .flatMap(p -> sendData(p, syncData.getMethod()))
+                .doOnComplete(() -> logDuration(syncData.getResources().size(), pageSize, start))
                 .blockLast();
     }
 
@@ -60,8 +61,9 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     protected abstract AdapterCapability getCapability();
 
 
-    protected Mono<?> post(SyncPage<T> page) {
-        return webClient.post()
+    protected Mono<?> sendData(SyncPage<T> page, SyncDataMethod method) {
+
+        return getRequest(method)
                 .uri("/provider" + getCapability().getEntityUri())
                 .body(Mono.just(page), FullSyncPage.class)
                 .retrieve()
@@ -69,6 +71,17 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                 .doOnNext(response -> {
                     log.info("Posting page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode());
                 });
+    }
+
+    private WebClient.RequestBodyUriSpec getRequest(SyncDataMethod method) {
+        switch (method) {
+            case POST:
+                return webClient.post();
+            case PATCH:
+                return webClient.patch();
+            default:
+                throw new IllegalArgumentException("Method not supported");
+        }
     }
 
     public List<SyncPage<T>> getPages(List<T> resources, int pageSize) {
@@ -119,8 +132,8 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     }
 
     @Override
-    public void onNext(List<T> resources) {
-        onSync(resources);
+    public void onNext(SyncData<T> syncData) {
+        onSync(syncData);
     }
 
     @Override

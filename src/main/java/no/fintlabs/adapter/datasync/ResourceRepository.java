@@ -1,4 +1,4 @@
-package no.fintlabs.adapter;
+package no.fintlabs.adapter.datasync;
 
 import no.fint.model.resource.FintLinks;
 

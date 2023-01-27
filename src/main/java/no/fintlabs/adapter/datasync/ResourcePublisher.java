@@ -1,12 +1,12 @@
-package no.fintlabs.adapter;
+package no.fintlabs.adapter.datasync;
 
 import no.fint.model.resource.FintLinks;
+import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterCapability;
 
-import java.util.List;
 import java.util.concurrent.SubmissionPublisher;
 
-public abstract class ResourcePublisher<T extends FintLinks, R extends ResourceRepository<T>> extends SubmissionPublisher<List<T>> {
+public abstract class ResourcePublisher<T extends FintLinks, R extends ResourceRepository<T>> extends SubmissionPublisher<SyncData<T>> {
 
     protected final R repository;
     protected final AdapterProperties adapterProperties;

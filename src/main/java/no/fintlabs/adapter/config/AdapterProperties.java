@@ -1,4 +1,4 @@
-package no.fintlabs.adapter;
+package no.fintlabs.adapter.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
