@@ -73,7 +73,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                 .retrieve()
                 .toBodilessEntity()
                 .doOnNext(response ->
-                    log.info("{}ing page {} returned {}. ({})", method.toString().toLowerCase(), page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
+                    log.info("{ page {} returned {}. ({})", method.toString().toLowerCase(), page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
                 );
 
     }
