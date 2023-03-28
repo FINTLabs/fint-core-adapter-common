@@ -45,8 +45,8 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
         int pageSize = 100;
         Instant start = Instant.now();
-        Flux.fromIterable(getPages(syncData.getResources(), syncData.getMethod(), pageSize))
-                .flatMap(p -> sendData(p, syncData.getMethod()))
+        Flux.fromIterable(getPages(syncData.getResources(), syncData.getSyncType(), pageSize))
+                .flatMap(this::SendPages)
                 .doOnComplete(() -> logDuration(syncData.getResources().size(), pageSize, start))
                 .blockLast();
     }
@@ -65,24 +65,24 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     protected abstract AdapterCapability getCapability();
 
 
-    protected Mono<?> sendData(SyncPage<T> page, SyncDataMethod method) {
+    protected Mono<?> SendPages(SyncPage<T> page) {
         return webClient
-                .method(getHttpMethod(method))
+                .method(getHttpMethod(page.getSyncType()))
                 .uri("/provider" + getCapability().getEntityUri())
                 .body(Mono.just(page), FullSyncPage.class)
                 .retrieve()
                 .toBodilessEntity()
                 .doOnNext(response ->
-                    log.info("{ page {} returned {}. ({})", method.toString().toLowerCase(), page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
+                    log.info("Page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
                 );
 
     }
 
-    private HttpMethod getHttpMethod(SyncDataMethod method) {
-        switch (method) {
-            case POST:
+    private HttpMethod getHttpMethod(SyncType syncType) {
+        switch (syncType) {
+            case FULL:
                 return HttpMethod.POST;
-            case PATCH:
+            case DELTA:
                 return HttpMethod.PATCH;
             case DELETE:
                 return HttpMethod.DELETE;
@@ -91,7 +91,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         }
     }
 
-    public List<SyncPage<T>> getPages(List<T> resources, SyncDataMethod syncDataMethod, int pageSize) {
+    public List<SyncPage<T>> getPages(List<T> resources, SyncType syncType, int pageSize) {
         List<SyncPage<T>> pages = new ArrayList<>();
         int totalSize = resources.size();
         String corrId = UUID.randomUUID().toString();
@@ -107,7 +107,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
             pages.add(FullSyncPage.<T>builder()
                     .resources(entries)
-                            .syncType(setSyncType(syncDataMethod))
+                            .syncType(syncType)
                     .metadata(SyncPageMetadata.builder()
                             .orgId(adapterProperties.getOrgId())
                             .adapterId(adapterProperties.getId())
@@ -128,15 +128,6 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         }
 
         return pages;
-    }
-
-    private SyncType setSyncType(SyncDataMethod syncDataMethod) {
-        switch (syncDataMethod) {
-            case POST: return SyncType.FULL;
-            case PATCH: return SyncType.DELTA;
-            case DELETE: return SyncType.DELETE;
-            default: return null;
-        }
     }
 
     protected abstract SyncPageEntry<T> createSyncPageEntry(T resource);
