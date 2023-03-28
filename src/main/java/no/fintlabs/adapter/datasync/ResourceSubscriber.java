@@ -5,7 +5,6 @@ import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.*;
 import no.fintlabs.adapter.validator.ValidatorService;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -73,7 +72,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                 .retrieve()
                 .toBodilessEntity()
                 .doOnNext(response ->
-                    log.info("Page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
+                        log.info("Page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
                 );
 
     }
@@ -94,7 +93,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
             pages.add(FullSyncPage.<T>builder()
                     .resources(entries)
-                            .syncType(syncType)
+                    .syncType(syncType)
                     .metadata(SyncPageMetadata.builder()
                             .orgId(adapterProperties.getOrgId())
                             .adapterId(adapterProperties.getId())
