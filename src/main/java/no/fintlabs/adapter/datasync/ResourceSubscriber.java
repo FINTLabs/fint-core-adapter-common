@@ -66,45 +66,16 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
 
     protected Mono<?> SendPages(SyncPage<T> page) {
-        HttpMethod httpMethod = getHttpMethod(page.getSyncType());
-        Class<?> clazz = getClass(page.getSyncType());
-
         return webClient
-                .method(httpMethod)
+                .method(page.getSyncType().getHttpMethod())
                 .uri("/provider" + getCapability().getEntityUri())
-                .body(Mono.just(page), clazz)
+                .body(Mono.just(page), SyncPage.class)
                 .retrieve()
                 .toBodilessEntity()
                 .doOnNext(response ->
                     log.info("Page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
                 );
 
-    }
-
-    private Class<?> getClass(SyncType syncType) {
-        switch (syncType) {
-            case FULL:
-                return FullSyncPage.class;
-            case DELTA:
-                return DeltaSyncPage.class;
-            case DELETE:
-                return DeleteSyncPage.class;
-            default:
-                throw new IllegalArgumentException("Class not supported");
-        }
-    }
-
-    private HttpMethod getHttpMethod(SyncType syncType) {
-        switch (syncType) {
-            case FULL:
-                return HttpMethod.POST;
-            case DELTA:
-                return HttpMethod.PATCH;
-            case DELETE:
-                return HttpMethod.DELETE;
-            default:
-                throw new IllegalArgumentException("Method not supported");
-        }
     }
 
     public List<SyncPage<T>> getPages(List<T> resources, SyncType syncType, int pageSize) {
