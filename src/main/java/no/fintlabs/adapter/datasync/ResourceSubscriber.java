@@ -24,11 +24,14 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         implements Subscriber<SyncData<T>> {
 
     private final WebClient webClient;
-    private final ValidatorService validatorService;
+    private final ValidatorService<T> validatorService;
     protected final AdapterProperties adapterProperties;
 
 
-    protected ResourceSubscriber(WebClient webClient, AdapterProperties adapterProperties, P publisher, ValidatorService validatorService) {
+    protected ResourceSubscriber(WebClient webClient,
+                                 AdapterProperties adapterProperties,
+                                 P publisher,
+                                 ValidatorService<T> validatorService) {
         this.webClient = webClient;
         this.adapterProperties = adapterProperties;
         this.validatorService = validatorService;
@@ -41,8 +44,8 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
         int pageSize = 100;
         Instant start = Instant.now();
-        Flux.fromIterable(getPages(syncData.getResources(), pageSize))
-                .flatMap(p -> sendData(p, syncData.getMethod()))
+        Flux.fromIterable(getPages(syncData.getResources(), syncData.getSyncType(), pageSize))
+                .flatMap(this::SendPages)
                 .doOnComplete(() -> logDuration(syncData.getResources().size(), pageSize, start))
                 .blockLast();
     }
@@ -61,31 +64,20 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     protected abstract AdapterCapability getCapability();
 
 
-    protected Mono<?> sendData(SyncPage<T> page, SyncDataMethod method) {
-
-        return getRequest(method)
+    protected Mono<?> SendPages(SyncPage<T> page) {
+        return webClient
+                .method(page.getSyncType().getHttpMethod())
                 .uri("/provider" + getCapability().getEntityUri())
-                .body(Mono.just(page), FullSyncPage.class)
+                .body(Mono.just(page), SyncPage.class)
                 .retrieve()
                 .toBodilessEntity()
-                .doOnNext(response -> {
-                    log.info("Posting page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode());
-                });
+                .doOnNext(response ->
+                        log.info("Page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
+                );
+
     }
 
-    private WebClient.RequestBodyUriSpec getRequest(SyncDataMethod method) {
-        switch (method) {
-            case POST:
-                return webClient.post();
-            case PATCH:
-                return webClient.patch();
-            default:
-                throw new IllegalArgumentException("Method not supported");
-        }
-    }
-
-    public List<SyncPage<T>> getPages(List<T> resources, int pageSize) {
-
+    public List<SyncPage<T>> getPages(List<T> resources, SyncType syncType, int pageSize) {
         List<SyncPage<T>> pages = new ArrayList<>();
         int totalSize = resources.size();
         String corrId = UUID.randomUUID().toString();
@@ -101,6 +93,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
             pages.add(FullSyncPage.<T>builder()
                     .resources(entries)
+                    .syncType(syncType)
                     .metadata(SyncPageMetadata.builder()
                             .orgId(adapterProperties.getOrgId())
                             .adapterId(adapterProperties.getId())
