@@ -13,11 +13,11 @@ import java.util.List;
 @Service
 public class ValidatorService<T extends FintLinks> {
 
-    public void validate(List<SyncPage<T>> pages, int totalSize) {
+    public void validate(List<SyncPage<T>> pages, int resourceSize) {
         if (!validPageSize(pages))
             log.warn("Page size does not match resources size!");
-        if (!validTotalSize(pages, totalSize))
-            log.warn("Total size doesnt match amount of elements!");
+        if (!validTotalSize(pages, resourceSize))
+            log.warn("Total size doesnt match amount of resources!");
         if (hasDuplicateIds(pages))
             log.warn("Duplicate ids found!");
         if (!validIds(pages))
@@ -35,7 +35,7 @@ public class ValidatorService<T extends FintLinks> {
     public boolean hasDuplicateIds(List<SyncPage<T>> pages) {
         HashSet<String> uniqueIds = new HashSet<>();
         for (SyncPage<T> page : pages) {
-            for (SyncPageEntry entry : page.getResources()) {
+            for (SyncPageEntry<T> entry : page.getResources()) {
                 if (!uniqueIds.add(entry.getIdentifier())) {
                     return true;
                 }
