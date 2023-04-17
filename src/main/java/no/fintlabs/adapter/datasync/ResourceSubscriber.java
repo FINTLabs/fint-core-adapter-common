@@ -5,6 +5,8 @@ import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.*;
 import no.fintlabs.adapter.validator.ValidatorService;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,6 +25,8 @@ import static java.util.concurrent.Flow.Subscriber;
 public abstract class ResourceSubscriber<T extends FintLinks, P extends ResourcePublisher<T, ResourceRepository<T>>>
         implements Subscriber<SyncData<T>> {
 
+    @Value("${fint.adapter.page-size:100}")
+    private int pageSize;
     private final WebClient webClient;
     private final ValidatorService<T> validatorService;
     protected final AdapterProperties adapterProperties;
@@ -42,19 +46,20 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     public void onSync(SyncData<T> syncData) {
         log.info("Syncing {} items to endpoint {}", syncData.getResources().size(), getCapability().getEntityUri());
 
-        int pageSize = 100;
         Instant start = Instant.now();
-        Flux.fromIterable(getPages(syncData.getResources(), syncData.getSyncType(), pageSize))
-                .flatMap(this::SendPages)
-                .doOnComplete(() -> logDuration(syncData.getResources().size(), pageSize, start))
+        List<SyncPage<T>> pages = getPages(syncData.getResources(), syncData.getSyncType());
+        Flux.fromIterable(pages)
+                .flatMap(this::sendPages)
+                .doOnComplete(() -> logDuration(syncData.getResources().size(), start))
                 .blockLast();
     }
 
-    private static void logDuration(int totalSize, int pageSize, Instant start) {
+    private void logDuration(int resourceSize, Instant start) {
         Duration timeElapsed = Duration.between(start, Instant.now());
-        log.info("Syncing {} elements in {} pages took {}:{}:{} to complete",
-                totalSize,
-                (totalSize + pageSize - 1) / pageSize,
+        int amountOfPages = (resourceSize + pageSize - 1) / pageSize;
+        log.info("Syncing {} resources in {} pages took {}:{}:{} to complete",
+                resourceSize,
+                amountOfPages,
                 String.format("%02d", timeElapsed.toHoursPart()),
                 String.format("%02d", timeElapsed.toMinutesPart()),
                 String.format("%02d", timeElapsed.toSecondsPart())
@@ -64,7 +69,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     protected abstract AdapterCapability getCapability();
 
 
-    protected Mono<?> SendPages(SyncPage<T> page) {
+    protected Mono<?> sendPages(SyncPage<T> page) {
         return webClient
                 .method(page.getSyncType().getHttpMethod())
                 .uri("/provider" + getCapability().getEntityUri())
@@ -77,43 +82,57 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
     }
 
-    public List<SyncPage<T>> getPages(List<T> resources, SyncType syncType, int pageSize) {
-        List<SyncPage<T>> pages = new ArrayList<>();
-        int totalSize = resources.size();
+    public List<SyncPage<T>> getPages(List<T> resources, SyncType syncType) {
         String corrId = UUID.randomUUID().toString();
+        int resourceSize = resources.size();
+        int amountOfPages = (resourceSize + pageSize - 1) / pageSize;
+        List<SyncPage<T>> pages = new ArrayList<>();
 
-        for (int i = 0; i < totalSize; i += pageSize) {
-            int end = Math.min((i + pageSize), resources.size());
-
-            List<SyncPageEntry<T>> entries = resources
-                    .subList(i, end)
-                    .stream()
-                    .map(this::createSyncPageEntry)
-                    .collect(Collectors.toList());
-
-            pages.add(FullSyncPage.<T>builder()
-                    .resources(entries)
-                    .syncType(syncType)
-                    .metadata(SyncPageMetadata.builder()
-                            .orgId(adapterProperties.getOrgId())
-                            .adapterId(adapterProperties.getId())
-                            .corrId(corrId)
-                            .totalPages((totalSize + pageSize - 1) / pageSize)
-                            .totalSize(totalSize)
-                            .pageSize(entries.size())
-                            .page((i / pageSize) + 1)
-                            .uriRef(getCapability().getEntityUri())
-                            .time(System.currentTimeMillis())
-                            .build()
-                    )
-                    .build());
+        for (int resourceIndex = 0; resourceIndex < resourceSize; resourceIndex += pageSize) {
+            SyncPage<T> syncPage = createSyncPage(corrId, resources, syncType, resourceSize, amountOfPages, resourceIndex);
+            pages.add(syncPage);
         }
 
         if (adapterProperties.isDebug()) {
-            validatorService.validate(pages, totalSize);
+            validatorService.validate(pages, resourceSize);
         }
 
         return pages;
+    }
+
+    private SyncPage<T> createSyncPage(String corrId, List<T> resources, SyncType syncType, int resourceSize, int totalPages, int resourceIndex) {
+        List<SyncPageEntry<T>> syncPageEntries = getSyncPageEntries(resources, resourceIndex);
+        SyncPageMetadata syncPageMetadata = getSyncPageMetadata(corrId, resourceSize, totalPages, resourceIndex, syncPageEntries);
+
+        return FullSyncPage.<T>builder()
+                .metadata(syncPageMetadata)
+                .resources(syncPageEntries)
+                .syncType(syncType)
+                .build();
+    }
+
+    private SyncPageMetadata getSyncPageMetadata(String corrId, int resourceAmount, int totalPages, int i, List<SyncPageEntry<T>> entries) {
+        return SyncPageMetadata.builder()
+                .orgId(adapterProperties.getOrgId())
+                .adapterId(adapterProperties.getId())
+                .corrId(corrId)
+                .totalPages(totalPages)
+                .totalSize(resourceAmount)
+                .pageSize(entries.size())
+                .page((i / pageSize) + 1)
+                .uriRef(getCapability().getEntityUri())
+                .time(System.currentTimeMillis())
+                .build();
+    }
+
+    @NotNull
+    private List<SyncPageEntry<T>> getSyncPageEntries(List<T> resources, int resourceIndex) {
+        int stoppingIndex = Math.min((resourceIndex + pageSize), resources.size());
+        return resources
+                .subList(resourceIndex, stoppingIndex)
+                .stream()
+                .map(this::createSyncPageEntry)
+                .collect(Collectors.toList());
     }
 
     protected abstract SyncPageEntry<T> createSyncPageEntry(T resource);
