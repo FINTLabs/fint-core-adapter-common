@@ -36,7 +36,7 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
     public abstract void doCheckForNewEvents();
 
     protected void checkForNewEvents() {
-        log.info("Check events for resource {}", getCapability().getEntityUri());
+        log.debug("Check events for resource {}", getCapability().getEntityUri());
 
         AdapterCapability adapterCapability = adapterProperties.getCapabilities().get(capabilityKey);
         String uri = String.format("/provider/event/%s/%s/%s/", adapterCapability.getDomainName(), adapterCapability.getPackageName(), adapterCapability.getResourceName());
@@ -63,7 +63,8 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
         // TODO: 21/12/2022 Handle errors?
 
         List<RequestFintEvent> body = response.getBody();
-        log.info("Event received with {} elements", body.size());
+        if (body.size() > 0) log.info("Event received with {} elements", body.size());
+        else log.debug("Event received with {} elements", body.size());
 
         body.forEach(requestEvent -> {
 
