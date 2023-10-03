@@ -39,7 +39,7 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
         log.debug("Check events for resource {}", getCapability().getEntityUri());
 
         AdapterCapability adapterCapability = adapterProperties.getCapabilities().get(capabilityKey);
-        String uri = String.format("/provider/event/%s/%s/%s/", adapterCapability.getDomainName(), adapterCapability.getPackageName(), adapterCapability.getResourceName());
+        String uri = "/provider/event/%s/%s/%s/".formatted(adapterCapability.getDomainName(), adapterCapability.getPackageName(), adapterCapability.getResourceName());
 
         webClient.get()
                 .uri(uri)

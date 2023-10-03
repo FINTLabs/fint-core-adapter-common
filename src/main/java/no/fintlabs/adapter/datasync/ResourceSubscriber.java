@@ -60,9 +60,9 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         log.info("Syncing {} resources in {} pages took {}:{}:{} to complete",
                 resourceSize,
                 amountOfPages,
-                String.format("%02d", timeElapsed.toHoursPart()),
-                String.format("%02d", timeElapsed.toMinutesPart()),
-                String.format("%02d", timeElapsed.toSecondsPart())
+                "%02d".formatted(timeElapsed.toHoursPart()),
+                "%02d".formatted(timeElapsed.toMinutesPart()),
+                "%02d".formatted(timeElapsed.toSecondsPart())
         );
     }
 
