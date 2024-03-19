@@ -43,12 +43,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'no.fintlabs:fint-core-infra-models:1.1.2'
+
     implementation 'org.apache.commons:commons-lang3:3.14.0'
     implementation 'io.netty:netty-resolver-dns-native-macos:4.1.101.Final:osx-aarch_64'
     implementation "jakarta.annotation:jakarta.annotation-api:3.0.0-M1"
     implementation "no.fint:fint-model-resource:0.4.1"
     implementation 'org.jetbrains:annotations:24.1.0'
+
+    api 'no.fintlabs:fint-core-infra-models:1.1.2'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
@@ -60,7 +62,6 @@ dependencies {
     testImplementation 'cglib:cglib-nodep:3.3.0'
     testImplementation 'org.spockframework:spock-spring:2.4-M1-groovy-4.0'
     testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
-
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
