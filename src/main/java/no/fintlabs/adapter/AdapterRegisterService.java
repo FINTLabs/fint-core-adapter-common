@@ -7,6 +7,9 @@ import no.fintlabs.adapter.models.AdapterContract;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 
 @Slf4j
 @Service
@@ -41,10 +44,19 @@ public class AdapterRegisterService {
                 .body(Mono.just(adapterContract), AdapterContract.class)
                 .retrieve()
                 .toBodilessEntity()
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(5))
+                        .filter(throwable -> {
+                            log.error("Registration failed, retrying...", throwable);
+                            return true;
+                        }))
                 .subscribe(response -> {
-                    log.info("Register return with code {}.", response.getStatusCode().value());
-                    heartbeatService.start();
-                });
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        log.info("Register return with code {}.", response.getStatusCode().value());
+                        heartbeatService.start();
+                    } else {
+                        log.error("Failed to register with code {}.", response.getStatusCode().value());
+                    }
+                }, throwable -> log.error("Failed to register after retries.", throwable));
 
         log.info("Keep on rocking in a free world ✌️🌻️🇺🇦!");
     }
