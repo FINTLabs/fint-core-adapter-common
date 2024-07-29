@@ -1,5 +1,7 @@
 package no.fintlabs.adapter;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterHeartbeat;
@@ -10,18 +12,14 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class HeartbeatService {
-
 
     private final WebClient webClient;
     private final AdapterProperties props;
 
+    @Getter
     private boolean started;
-
-    public HeartbeatService(WebClient webClient, AdapterProperties props) {
-        this.webClient = webClient;
-        this.props = props;
-    }
 
     public void start() {
         log.info("Started heartbeat service.");
@@ -32,7 +30,6 @@ public class HeartbeatService {
         log.info("Stopped heartbeat service.");
         started = false;
     }
-
 
     @Scheduled(fixedRateString = "#{@adapterProperties.getHeartbeatIntervalMs()}")
     public void doHeartbeat() {
@@ -58,6 +55,5 @@ public class HeartbeatService {
             log.info("Heartbeat service is not started yet!");
         }
     }
-
 
 }
