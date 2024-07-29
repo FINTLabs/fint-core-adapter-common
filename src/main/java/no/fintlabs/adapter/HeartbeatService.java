@@ -1,7 +1,5 @@
 package no.fintlabs.adapter;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterHeartbeat;
@@ -12,37 +10,27 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class HeartbeatService {
 
     private final WebClient webClient;
-    private final AdapterProperties props;
+    private final AdapterRegisterService adapterRegisterService;
+    private final AdapterHeartbeat adapterHeartbeat;
 
-    @Getter
-    private boolean started;
-
-    public void start() {
-        log.info("Started heartbeat service.");
-        started = true;
-    }
-
-    public void stop() {
-        log.info("Stopped heartbeat service.");
-        started = false;
+    public HeartbeatService(WebClient webClient, AdapterProperties props, AdapterRegisterService adapterRegisterService) {
+        this.webClient = webClient;
+        this.adapterRegisterService = adapterRegisterService;
+        adapterHeartbeat = AdapterHeartbeat.builder()
+                .time(System.currentTimeMillis())
+                .orgId(props.getOrgId())
+                .adapterId(props.getId())
+                .username(props.getUsername())
+                .build();
     }
 
     @Scheduled(fixedRateString = "#{@adapterProperties.getHeartbeatIntervalMs()}")
     public void doHeartbeat() {
-
-        if (started) {
+        if (adapterRegisterService.isRegistered()) {
             log.info("Sending heartbeat FINT...");
-            AdapterHeartbeat adapterHeartbeat = AdapterHeartbeat.builder()
-                    .time(System.currentTimeMillis())
-                    .orgId(props.getOrgId())
-                    .adapterId(props.getId())
-                    .username(props.getUsername())
-                    .build();
-
             webClient.post()
                     .uri("/provider/heartbeat")
                     .body(Mono.just(adapterHeartbeat), AdapterHeartbeat.class)
@@ -53,6 +41,7 @@ public class HeartbeatService {
                     });
         } else {
             log.info("Heartbeat service is not started yet!");
+            adapterRegisterService.registerAdapter();
         }
     }
 
