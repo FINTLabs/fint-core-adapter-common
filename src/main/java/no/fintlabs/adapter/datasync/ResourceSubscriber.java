@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.*;
+import no.fintlabs.adapter.models.sync.*;
 import no.fintlabs.adapter.validator.ValidatorService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         log.info("Syncing {} items to endpoint {}", syncData.getResources().size(), getCapability().getEntityUri());
 
         Instant start = Instant.now();
-        List<SyncPage<T>> pages = getPages(syncData.getResources(), syncData.getSyncType());
+        List<SyncPage> pages = getPages(syncData.getResources(), syncData.getSyncType());
         Flux.fromIterable(pages)
                 .flatMap(this::sendPages)
                 .doOnComplete(() -> logDuration(syncData.getResources().size(), start))
@@ -69,7 +70,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     protected abstract AdapterCapability getCapability();
 
 
-    protected Mono<?> sendPages(SyncPage<T> page) {
+    protected Mono<?> sendPages(SyncPage page) {
         return webClient
                 .method(page.getSyncType().getHttpMethod())
                 .uri("/provider" + getCapability().getEntityUri())
@@ -82,14 +83,14 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
 
     }
 
-    public List<SyncPage<T>> getPages(List<T> resources, SyncType syncType) {
+    public List<SyncPage> getPages(List<T> resources, SyncType syncType) {
         String corrId = UUID.randomUUID().toString();
         int resourceSize = resources.size();
         int amountOfPages = (resourceSize + pageSize - 1) / pageSize;
-        List<SyncPage<T>> pages = new ArrayList<>();
+        List<SyncPage> pages = new ArrayList<>();
 
         for (int resourceIndex = 0; resourceIndex < resourceSize; resourceIndex += pageSize) {
-            SyncPage<T> syncPage = createSyncPage(corrId, resources, syncType, resourceSize, amountOfPages, resourceIndex);
+            SyncPage syncPage = createSyncPage(corrId, resources, syncType, resourceSize, amountOfPages, resourceIndex);
             pages.add(syncPage);
         }
 
@@ -100,18 +101,18 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         return pages;
     }
 
-    private SyncPage<T> createSyncPage(String corrId, List<T> resources, SyncType syncType, int resourceSize, int totalPages, int resourceIndex) {
-        List<SyncPageEntry<T>> syncPageEntries = getSyncPageEntries(resources, resourceIndex);
+    private SyncPage createSyncPage(String corrId, List<T> resources, SyncType syncType, int resourceSize, int totalPages, int resourceIndex) {
+        List<SyncPageEntry> syncPageEntries = getSyncPageEntries(resources, resourceIndex);
         SyncPageMetadata syncPageMetadata = getSyncPageMetadata(corrId, resourceSize, totalPages, resourceIndex, syncPageEntries);
 
-        return FullSyncPage.<T>builder()
+        return FullSyncPage.builder()
                 .metadata(syncPageMetadata)
                 .resources(syncPageEntries)
                 .syncType(syncType)
                 .build();
     }
 
-    private SyncPageMetadata getSyncPageMetadata(String corrId, int resourceAmount, int totalPages, int i, List<SyncPageEntry<T>> entries) {
+    private SyncPageMetadata getSyncPageMetadata(String corrId, int resourceAmount, int totalPages, int i, List<SyncPageEntry> entries) {
         return SyncPageMetadata.builder()
                 .orgId(adapterProperties.getOrgId())
                 .adapterId(adapterProperties.getId())
@@ -126,7 +127,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     }
 
     @NotNull
-    private List<SyncPageEntry<T>> getSyncPageEntries(List<T> resources, int resourceIndex) {
+    private List<SyncPageEntry> getSyncPageEntries(List<T> resources, int resourceIndex) {
         int stoppingIndex = Math.min((resourceIndex + pageSize), resources.size());
         return resources
                 .subList(resourceIndex, stoppingIndex)
@@ -135,7 +136,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                 .collect(Collectors.toList());
     }
 
-    protected abstract SyncPageEntry<T> createSyncPageEntry(T resource);
+    protected abstract SyncPageEntry createSyncPageEntry(T resource);
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {

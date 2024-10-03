@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterCapability;
-import no.fintlabs.adapter.models.ResponseFintEvent;
+import no.fintlabs.adapter.models.event.ResponseFintEvent;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -13,7 +13,7 @@ import java.util.concurrent.Flow;
 
 @Slf4j
 public abstract class EventSubscriber<T extends FintLinks, P extends EventPublisher<T>>
-        implements Flow.Subscriber<ResponseFintEvent<T>> {
+        implements Flow.Subscriber<ResponseFintEvent> {
 
     private final WebClient webClient;
     protected final AdapterProperties adapterProperties;
@@ -27,7 +27,7 @@ public abstract class EventSubscriber<T extends FintLinks, P extends EventPublis
         publisher.subscribe(this);
     }
 
-    public void onSync(ResponseFintEvent<T> responseFintEvent) {
+    public void onSync(ResponseFintEvent responseFintEvent) {
 
         log.info("Posting response to event {}", responseFintEvent.getCorrId());
         webClient.post()
@@ -41,7 +41,7 @@ public abstract class EventSubscriber<T extends FintLinks, P extends EventPublis
                 );
     }
 
-    protected abstract void responsePostingEvent(ResponseEntity<Void> response, ResponseFintEvent<T> responseFintEvent);
+    protected abstract void responsePostingEvent(ResponseEntity<Void> response, ResponseFintEvent responseFintEvent);
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
@@ -50,7 +50,7 @@ public abstract class EventSubscriber<T extends FintLinks, P extends EventPublis
     }
 
     @Override
-    public void onNext(ResponseFintEvent<T> resources) {
+    public void onNext(ResponseFintEvent resources) {
         onSync(resources);
     }
 

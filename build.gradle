@@ -11,8 +11,10 @@ plugins {
 }
 
 group = 'no.fintlabs'
-sourceCompatibility = '17'
-targetCompatibility = '17'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 publishing {
     publications {
@@ -50,7 +52,7 @@ dependencies {
     implementation "no.fint:fint-model-resource:0.4.1"
     implementation 'org.jetbrains:annotations:24.1.0'
 
-    api 'no.fintlabs:fint-core-infra-models:1.1.2'
+    api 'no.fintlabs:fint-core-infra-models:2.0.0-rc-9'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'

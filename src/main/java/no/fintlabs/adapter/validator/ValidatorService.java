@@ -2,8 +2,8 @@ package no.fintlabs.adapter.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
-import no.fintlabs.adapter.models.SyncPage;
-import no.fintlabs.adapter.models.SyncPageEntry;
+import no.fintlabs.adapter.models.sync.SyncPage;
+import no.fintlabs.adapter.models.sync.SyncPageEntry;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class ValidatorService<T extends FintLinks> {
 
-    public void validate(List<SyncPage<T>> pages, int resourceSize) {
+    public void validate(List<SyncPage> pages, int resourceSize) {
         if (!validPageSize(pages))
             log.warn("Page size does not match resources size!");
         if (!validTotalSize(pages, resourceSize))
@@ -24,18 +24,18 @@ public class ValidatorService<T extends FintLinks> {
             log.warn("One or more Id's is not valid");
     }
 
-    public boolean validPageSize(List<SyncPage<T>> pages) {
+    public boolean validPageSize(List<SyncPage> pages) {
         return pages.stream().allMatch(page -> page.getMetadata().getPageSize() == page.getResources().size());
     }
 
-    public boolean validTotalSize(List<SyncPage<T>> pages, int totalSize) {
+    public boolean validTotalSize(List<SyncPage> pages, int totalSize) {
         return pages.stream().mapToInt(page -> page.getResources().size()).sum() == totalSize;
     }
 
-    public boolean hasDuplicateIds(List<SyncPage<T>> pages) {
+    public boolean hasDuplicateIds(List<SyncPage> pages) {
         HashSet<String> uniqueIds = new HashSet<>();
-        for (SyncPage<T> page : pages) {
-            for (SyncPageEntry<T> entry : page.getResources()) {
+        for (SyncPage page : pages) {
+            for (SyncPageEntry entry : page.getResources()) {
                 if (!uniqueIds.add(entry.getIdentifier())) {
                     return true;
                 }
@@ -44,7 +44,7 @@ public class ValidatorService<T extends FintLinks> {
         return false;
     }
 
-    public boolean validIds(List<SyncPage<T>> pages) {
+    public boolean validIds(List<SyncPage> pages) {
         return pages.stream()
                 .flatMap(p -> p.getResources().stream())
                 .allMatch(r -> r.getIdentifier().matches("^urn:[a-z0-9][a-z0-9-]{1,31}:([a-z0-9()+,-.:=@;$_!*']|%[0-9a-f]{2})*$"));
