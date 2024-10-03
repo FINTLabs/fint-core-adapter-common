@@ -1,7 +1,6 @@
 package no.fintlabs.adapter.validator;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.models.sync.SyncPage;
 import no.fintlabs.adapter.models.sync.SyncPageEntry;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class ValidatorService<T extends FintLinks> {
+public class ValidatorService {
 
     public void validate(List<SyncPage> pages, int resourceSize) {
         if (!validPageSize(pages))
