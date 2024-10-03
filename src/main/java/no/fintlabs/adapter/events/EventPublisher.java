@@ -1,6 +1,5 @@
 package no.fintlabs.adapter.events;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
@@ -67,15 +66,8 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
         else log.debug("Event received with {} elements", body.size());
 
         body.forEach(requestEvent -> {
-
-            try {
-                T resource = (T) objectMapper.readValue(requestEvent.getValue(), classOfT);
-                handleEvent(requestEvent, resource);
-            } catch (JsonProcessingException e) {
-                // TODO: 21/12/2022 Handle error?
-                throw new RuntimeException(e);
-            }
-
+            T resource = (T) objectMapper.convertValue(requestEvent.getValue(), classOfT);
+            handleEvent(requestEvent, resource);
         });
     }
 
