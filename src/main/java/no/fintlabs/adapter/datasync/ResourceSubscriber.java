@@ -29,14 +29,14 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     @Value("${fint.adapter.page-size:100}")
     private int pageSize;
     private final WebClient webClient;
-    private final ValidatorService<T> validatorService;
+    private final ValidatorService validatorService;
     protected final AdapterProperties adapterProperties;
 
 
     protected ResourceSubscriber(WebClient webClient,
                                  AdapterProperties adapterProperties,
                                  P publisher,
-                                 ValidatorService<T> validatorService) {
+                                 ValidatorService validatorService) {
         this.webClient = webClient;
         this.adapterProperties = adapterProperties;
         this.validatorService = validatorService;
