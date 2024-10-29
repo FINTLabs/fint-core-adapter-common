@@ -52,7 +52,7 @@ dependencies {
     implementation "no.fint:fint-model-resource:0.4.1"
     implementation 'org.jetbrains:annotations:24.1.0'
 
-    api 'no.fintlabs:fint-core-infra-models:2.0.0-rc-11'
+    api 'no.fintlabs:fint-core-infra-models:2.0.0-rc-12'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
