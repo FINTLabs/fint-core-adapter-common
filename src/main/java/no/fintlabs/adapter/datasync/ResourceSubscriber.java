@@ -48,7 +48,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
         log.info("Syncing {} items to endpoint {}", syncData.getResources().size(), getCapability().getEntityUri());
 
         Instant start = Instant.now();
-        List<SyncPage> pages = getPages(syncData.getResources(), syncData.getSyncType());
+        List<SyncPage> pages = createSyncPages(syncData.getResources(), syncData.getSyncType());
         Flux.fromIterable(pages)
                 .flatMap(this::sendPages)
                 .doOnComplete(() -> logDuration(syncData.getResources().size(), start))
@@ -80,11 +80,11 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                 .doOnNext(response ->
                         log.info("Page {} returned {}. ({})", page.getMetadata().getPage(), page.getMetadata().getCorrId(), response.getStatusCode())
                 );
-
     }
 
-    public List<SyncPage> getPages(List<T> resources, SyncType syncType) {
+    public List<SyncPage> createSyncPages(List<T> resources, SyncType syncType) {
         String corrId = UUID.randomUUID().toString();
+
         int resourceSize = resources.size();
         int amountOfPages = (resourceSize + pageSize - 1) / pageSize;
         List<SyncPage> pages = new ArrayList<>();
@@ -102,7 +102,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     }
 
     private SyncPage createSyncPage(String corrId, List<T> resources, SyncType syncType, int resourceSize, int totalPages, int resourceIndex) {
-        List<SyncPageEntry> syncPageEntries = getSyncPageEntries(resources, resourceIndex);
+        List<SyncPageEntry> syncPageEntries = createSyncPageEntries(resources, resourceIndex);
         SyncPageMetadata syncPageMetadata = getSyncPageMetadata(corrId, resourceSize, totalPages, resourceIndex, syncPageEntries);
 
         return FullSyncPage.builder()
@@ -127,7 +127,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
     }
 
     @NotNull
-    private List<SyncPageEntry> getSyncPageEntries(List<T> resources, int resourceIndex) {
+    private List<SyncPageEntry> createSyncPageEntries(List<T> resources, int resourceIndex) {
         int stoppingIndex = Math.min((resourceIndex + pageSize), resources.size());
         return resources
                 .subList(resourceIndex, stoppingIndex)
