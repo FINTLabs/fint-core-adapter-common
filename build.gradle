@@ -1,12 +1,12 @@
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
-    id 'org.springframework.boot' version '3.2.0' apply false
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.4.1' apply false
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'groovy'
     id 'maven-publish'
     id 'java-library'
-    id 'com.github.ben-manes.versions' version '0.50.0'
+    id 'com.github.ben-manes.versions' version '0.51.0'
     id 'se.patrikerdes.use-latest-versions' version '0.2.18'
 }
 
@@ -46,13 +46,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    implementation 'org.apache.commons:commons-lang3:3.14.0'
-    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.101.Final:osx-aarch_64'
-    implementation "jakarta.annotation:jakarta.annotation-api:3.0.0-M1"
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.116.Final:osx-aarch_64'
+    implementation "jakarta.annotation:jakarta.annotation-api:3.0.0"
     implementation "no.fint:fint-model-resource:0.4.1"
-    implementation 'org.jetbrains:annotations:24.1.0'
+    implementation 'org.jetbrains:annotations:26.0.1'
 
-    api 'no.fintlabs:fint-core-infra-models:2.0.0-rc-12'
+    api 'no.fintlabs:fint-core-infra-models:2.1.0-rc-5'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
@@ -62,8 +62,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'cglib:cglib-nodep:3.3.0'
-    testImplementation 'org.spockframework:spock-spring:2.4-M1-groovy-4.0'
-    testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
+    testImplementation 'org.spockframework:spock-spring:2.4-M4-groovy-4.0'
+    testImplementation 'org.spockframework:spock-core:2.4-M4-groovy-4.0'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
