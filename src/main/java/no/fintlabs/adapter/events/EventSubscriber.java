@@ -28,7 +28,6 @@ public abstract class EventSubscriber<T extends FintLinks, P extends EventPublis
     }
 
     public void onSync(ResponseFintEvent responseFintEvent) {
-
         log.info("Posting response to event {}", responseFintEvent.getCorrId());
         webClient.post()
                 .uri("/provider/event")
