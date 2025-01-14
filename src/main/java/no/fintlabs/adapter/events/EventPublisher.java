@@ -50,9 +50,10 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
     }
 
     protected ResponseFintEvent createResponse(RequestFintEvent requestFintEvent) {
-        return ResponseFintEvent.<T>builder()
+        return ResponseFintEvent.builder()
                 .corrId(requestFintEvent.getCorrId())
                 .orgId(adapterProperties.getOrgId())
+                .operationType(requestFintEvent.getOperationType())
                 .adapterId(adapterProperties.getId())
                 .handledAt(System.currentTimeMillis())
                 .build();
