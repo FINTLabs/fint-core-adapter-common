@@ -53,6 +53,7 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
         return ResponseFintEvent.<T>builder()
                 .corrId(requestFintEvent.getCorrId())
                 .orgId(adapterProperties.getOrgId())
+                .operationType(requestFintEvent.getOperationType())
                 .adapterId(adapterProperties.getId())
                 .handledAt(System.currentTimeMillis())
                 .build();
