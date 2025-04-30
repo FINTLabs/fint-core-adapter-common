@@ -112,7 +112,7 @@ public abstract class ResourceSubscriber<T extends FintLinks, P extends Resource
                 .build();
     }
 
-    private SyncPageMetadata getSyncPageMetadata(String corrId, int resourceAmount, int totalPages, int i, List<SyncPageEntry<T>> entries) {
+    private SyncPageMetadata getSyncPageMetadata(String corrId, int resourceAmount, int totalPages, int i, List<SyncPageEntry> entries) {
         return SyncPageMetadata.builder()
                 .orgId(adapterProperties.getOrgId())
                 .adapterId(adapterProperties.getId())

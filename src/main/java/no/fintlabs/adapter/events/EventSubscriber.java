@@ -41,7 +41,7 @@ public abstract class EventSubscriber<T extends FintLinks, P extends EventPublis
                 );
     }
 
-    protected abstract void responsePostingEvent(ResponseEntity<Void> response, ResponseFintEvent<T> responseFintEvent);
+    protected abstract void responsePostingEvent(ResponseEntity<Void> response, ResponseFintEvent responseFintEvent);
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {

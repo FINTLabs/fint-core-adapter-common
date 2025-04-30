@@ -1,7 +1,6 @@
-import no.fintlabs.adapter.models.SyncPage
-import no.fintlabs.adapter.models.SyncPageEntry
-import no.fintlabs.adapter.models.SyncPageMetadata
-import no.fintlabs.adapter.models.SyncType
+import no.fintlabs.adapter.models.sync.SyncPage
+import no.fintlabs.adapter.models.sync.SyncPageEntry
+import no.fintlabs.adapter.models.sync.SyncPageMetadata
 import no.fintlabs.adapter.validator.ValidatorService
 import spock.lang.Specification
 
