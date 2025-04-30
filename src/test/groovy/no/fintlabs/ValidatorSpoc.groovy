@@ -1,3 +1,5 @@
+package no.fintlabs
+
 import no.fintlabs.adapter.models.sync.SyncPage
 import no.fintlabs.adapter.models.sync.SyncPageEntry
 import no.fintlabs.adapter.models.sync.SyncPageMetadata
