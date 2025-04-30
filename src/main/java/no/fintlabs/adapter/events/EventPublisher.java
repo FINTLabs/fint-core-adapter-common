@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterCapability;
-import no.fintlabs.adapter.models.RequestFintEvent;
-import no.fintlabs.adapter.models.ResponseFintEvent;
+import no.fintlabs.adapter.models.event.RequestFintEvent;
+import no.fintlabs.adapter.models.event.ResponseFintEvent;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.SubmissionPublisher;
 
 @Slf4j
-public abstract class EventPublisher<T extends FintLinks> extends SubmissionPublisher<ResponseFintEvent<T>> {
+public abstract class EventPublisher<T extends FintLinks> extends SubmissionPublisher<ResponseFintEvent> {
 
     protected final AdapterProperties adapterProperties;
     protected final WriteableResourceRepository<T> repository;
@@ -49,7 +49,7 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
                 .subscribe(this::handleEvents);
     }
 
-    protected ResponseFintEvent<T> createResponse(RequestFintEvent requestFintEvent) {
+    protected ResponseFintEvent createResponse(RequestFintEvent requestFintEvent) {
         return ResponseFintEvent.<T>builder()
                 .corrId(requestFintEvent.getCorrId())
                 .orgId(adapterProperties.getOrgId())
