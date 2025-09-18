@@ -22,7 +22,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1.1.0
+        uses: gradle/wrapper-validation-action@v3.5.0
 
       - name: Gradle Build and publish to Reposilite
         uses: gradle/gradle-build-action@v2.8.0
