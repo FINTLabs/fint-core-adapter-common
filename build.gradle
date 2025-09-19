@@ -46,7 +46,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
     implementation 'io.netty:netty-resolver-dns-native-macos:4.1.116.Final:osx-aarch_64'
     implementation "jakarta.annotation:jakarta.annotation-api:3.0.0"
     implementation "no.fint:fint-model-resource:0.4.1"
