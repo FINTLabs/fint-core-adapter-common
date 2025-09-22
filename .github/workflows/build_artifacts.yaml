@@ -23,18 +23,23 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Build artefacts
-        run: |
-          gradle build --no-daemon
-          mkdir data
-          cp ./build/libs/${GITHUB_REPOSITORY#*/}*.jar ./data/app.jar
-          echo "Branch: ${{ github.ref}}"
+      # Validate Gradle wrapper to ensure wrapper files are correct
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v3
 
-      - name: Upload a Build Artifact
+      # Set up Gradle and run the build using the wrapper
+      - name: Gradle Build
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
+          arguments: clean build --no-daemon
+
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.REPO_NAME }}
-          path: ./data/app.jar
+          path: build/libs/*.jar
+          retention-days: 7 # Artifacts are retained for 7 days
 
 ## Uncomment to trigger deploy to alpha when pull request
 ## Use for development. For prod use "Start publish workflow"

@@ -27,6 +27,7 @@ jobs:
       - name: Gradle Build and publish to Reposilite
         uses: gradle/actions/setup-gradle@v3
         with:
+          gradle-version: wrapper
           arguments: |
             clean
             build
