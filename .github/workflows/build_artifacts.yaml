@@ -29,7 +29,7 @@ jobs:
 
       # Set up Gradle and run the build using the wrapper
       - name: Gradle Build
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
           arguments: clean build --no-daemon
