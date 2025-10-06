@@ -25,11 +25,11 @@ jobs:
 
       # Validate Gradle wrapper to ensure wrapper files are correct
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v5
 
       # Set up Gradle and run the build using the wrapper
       - name: Gradle Build
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: wrapper
           arguments: clean build --no-daemon
