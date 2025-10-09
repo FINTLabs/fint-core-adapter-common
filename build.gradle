@@ -41,7 +41,7 @@ dependencies {
 
     implementation 'org.apache.commons:commons-lang3:3.18.0'
     runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.127.Final:osx-aarch_64'
-    implementation 'org.jetbrains:annotations:26.0.1'
+    implementation 'org.jetbrains:annotations:26.0.2-1'
 
     api 'no.fintlabs:fint-core-infra-models:2.1.2'
 
