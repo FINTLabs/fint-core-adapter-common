@@ -24,15 +24,14 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@v3
 
-      - name: Gradle Build and publish to Reposilite
-        uses: gradle/actions/setup-gradle@v3
+      # Set up Gradle
+      - name: Gradle Setup
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: wrapper
-          arguments: |
-            clean
-            build
-            publish
-            -Pversion=${{ env.RELEASE_VERSION }}
+
+      - name: Gradle Build and publish to Reposilite
+        run: ./gradlew build publish -Pversion=${{ env.RELEASE_VERSION }}
         env:
           REPOSILITE_USERNAME: ${{ secrets.REPOSILITE_USERNAME }}
           REPOSILITE_PASSWORD: ${{ secrets.REPOSILITE_PASSWORD }}
