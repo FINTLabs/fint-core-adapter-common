@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
     runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.127.Final:osx-aarch_64'
     implementation 'org.jetbrains:annotations:26.0.1'
 
