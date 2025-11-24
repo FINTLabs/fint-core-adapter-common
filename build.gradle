@@ -53,8 +53,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'cglib:cglib-nodep:3.3.0'
-    testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
-    testImplementation 'org.spockframework:spock-core:2.4-M6-groovy-4.0'
+    testImplementation 'org.spockframework:spock-spring:2.4-M7-groovy-5.0'
+    testImplementation 'org.spockframework:spock-core:2.4-M7-groovy-5.0'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
