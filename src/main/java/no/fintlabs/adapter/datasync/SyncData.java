@@ -1,7 +1,7 @@
 package no.fintlabs.adapter.datasync;
 
 import lombok.Data;
-import no.fint.model.resource.FintLinks;
+import no.novari.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.models.sync.SyncType;
 
 import java.util.List;

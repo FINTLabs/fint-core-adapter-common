@@ -1,6 +1,6 @@
 package no.fintlabs.adapter.events;
 
-import no.fint.model.resource.FintLinks;
+import no.novari.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.datasync.ResourceRepository;
 import no.fintlabs.adapter.models.event.RequestFintEvent;
 

@@ -1,6 +1,6 @@
 package no.fintlabs.adapter.datasync;
 
-import no.fint.model.resource.FintLinks;
+import no.novari.fint.model.resource.FintLinks;
 
 import java.util.List;
 
