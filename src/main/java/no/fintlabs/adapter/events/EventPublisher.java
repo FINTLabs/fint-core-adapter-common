@@ -1,15 +1,15 @@
 package no.fintlabs.adapter.events;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterCapability;
 import no.fintlabs.adapter.models.event.RequestFintEvent;
 import no.fintlabs.adapter.models.event.ResponseFintEvent;
+import no.novari.fint.model.resource.FintLinks;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.concurrent.SubmissionPublisher;
@@ -72,7 +72,7 @@ public abstract class EventPublisher<T extends FintLinks> extends SubmissionPubl
             T resource = null;
             try {
                 resource = objectMapper.readValue(requestEvent.getValue(), classOfT);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 throw new RuntimeException(e);
             }
             handleEvent(requestEvent, resource);

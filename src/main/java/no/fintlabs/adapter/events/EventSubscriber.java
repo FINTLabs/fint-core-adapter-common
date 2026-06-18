@@ -1,10 +1,10 @@
 package no.fintlabs.adapter.events;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterCapability;
 import no.fintlabs.adapter.models.event.ResponseFintEvent;
+import no.novari.fint.model.resource.FintLinks;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
