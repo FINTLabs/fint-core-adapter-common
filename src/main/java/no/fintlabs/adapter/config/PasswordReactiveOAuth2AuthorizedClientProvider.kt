@@ -1,5 +1,6 @@
 package no.fintlabs.adapter.config
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.security.oauth2.client.OAuth2AuthorizationContext
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
@@ -38,7 +39,13 @@ class PasswordReactiveOAuth2AuthorizedClientProvider(
                 if (response.statusCode().is2xxSuccessful)
                     response.body(OAuth2BodyExtractors.oauth2AccessTokenResponse())
                 else
-                    response.createException().flatMap { Mono.error(it) }
+                    response.createException().flatMap { ex ->
+                        log.error(
+                            "Token request to {} failed with {}: {}",
+                            registration.providerDetails.tokenUri, ex.statusCode, ex.responseBodyAsString
+                        )
+                        Mono.error(ex)
+                    }
             }
             .map { token ->
                 OAuth2AuthorizedClient(registration, context.principal.name, token.accessToken, token.refreshToken)
@@ -57,5 +64,9 @@ class PasswordReactiveOAuth2AuthorizedClientProvider(
     private fun OAuth2AccessToken.isExpired(): Boolean {
         val expiresAt = expiresAt ?: return true
         return Instant.now(clock).isAfter(expiresAt.minus(clockSkew))
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(PasswordReactiveOAuth2AuthorizedClientProvider::class.java)
     }
 }

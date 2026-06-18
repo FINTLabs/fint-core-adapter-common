@@ -42,7 +42,7 @@ public class AdapterRegisterService {
                 .toBodilessEntity()
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(5))
                         .filter(throwable -> {
-                            log.error("Registration failed, retrying...", throwable);
+                            log.error("Registration failed, retrying... {}", throwable.getMessage());
                             return true;
                         }))
                 .subscribe(response -> {
@@ -52,7 +52,7 @@ public class AdapterRegisterService {
                     } else {
                         log.error("Failed to register with code {}.", response.getStatusCode().value());
                     }
-                }, throwable -> log.error("Failed to register after retries.", throwable));
+                }, throwable -> log.error("Failed to register after retries: {}", throwable.getMessage()));
 
         log.info("Keep on rocking in a free world ✌️🌻️🇺🇦!");
     }
