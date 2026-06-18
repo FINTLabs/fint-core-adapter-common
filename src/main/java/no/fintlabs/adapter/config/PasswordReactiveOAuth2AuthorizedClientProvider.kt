@@ -32,7 +32,6 @@ class PasswordReactiveOAuth2AuthorizedClientProvider(
 
         return webClient.post()
             .uri(registration.providerDetails.tokenUri)
-            .headers { it.setBasicAuth(registration.clientId, registration.clientSecret) }
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(BodyInserters.fromFormData(createForm(registration)))
             .exchangeToMono { response ->
@@ -48,6 +47,8 @@ class PasswordReactiveOAuth2AuthorizedClientProvider(
 
     private fun createForm(registration: ClientRegistration) = LinkedMultiValueMap<String, String>().apply {
         add("grant_type", "password")
+        add("client_id", registration.clientId)
+        add("client_secret", registration.clientSecret)
         add("username", username)
         add("password", password)
         registration.scopes?.takeIf { it.isNotEmpty() }?.let { add("scope", it.joinToString(" ")) }
