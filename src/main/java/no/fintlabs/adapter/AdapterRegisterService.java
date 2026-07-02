@@ -27,7 +27,7 @@ public class AdapterRegisterService {
                 .adapterId(props.getId())
                 .orgId(props.getOrgId())
                 .time(System.currentTimeMillis())
-                .heartbeatIntervalInMinutes(props.getHeartbeatInterval())
+                .heartbeatIntervalInMinutes(props.getHeartbeatIntervalInMinutes())
                 .username(props.getUsername())
                 .capabilities(props.adapterCapabilityToSet())
                 .build();
