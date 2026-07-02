@@ -11,9 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set version
-        run: |
-          echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/*/} | sed "s/^v//")" >> $GITHUB_ENV
-          echo "refs: ${{ github.ref }}"
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: echo "RELEASE_VERSION=${TAG_NAME#v}" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
