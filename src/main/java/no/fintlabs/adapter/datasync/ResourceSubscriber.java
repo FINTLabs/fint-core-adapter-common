@@ -1,11 +1,11 @@
 package no.fintlabs.adapter.datasync;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.*;
 import no.fintlabs.adapter.models.sync.*;
 import no.fintlabs.adapter.validator.ValidatorService;
+import no.novari.fint.model.resource.FintLinks;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;

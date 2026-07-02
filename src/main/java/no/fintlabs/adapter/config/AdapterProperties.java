@@ -21,7 +21,7 @@ import java.util.Set;
 @ConfigurationProperties(prefix = "fint.adapter")
 public class AdapterProperties {
 
-    private int heartbeatInterval;
+    private int heartbeatIntervalInMinutes;
     private String id;
     private String username;
     private String password;
@@ -36,7 +36,7 @@ public class AdapterProperties {
         return new HashSet<>(capabilities.values());
     }
     public long getHeartbeatIntervalMs() {
-        return Duration.parse("PT" + heartbeatInterval + "M").toMillis();
+        return Duration.parse("PT" + heartbeatIntervalInMinutes + "M").toMillis();
     }
 
     public long getFullSyncIntervalMs(String entity) {

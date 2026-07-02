@@ -1,8 +1,8 @@
 package no.fintlabs.adapter.datasync;
 
-import no.fint.model.resource.FintLinks;
 import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterCapability;
+import no.novari.fint.model.resource.FintLinks;
 
 import java.util.concurrent.SubmissionPublisher;
 

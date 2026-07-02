@@ -6,6 +6,7 @@ import no.fintlabs.adapter.config.AdapterProperties;
 import no.fintlabs.adapter.models.AdapterContract;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -27,7 +28,7 @@ public class AdapterRegisterService {
                 .adapterId(props.getId())
                 .orgId(props.getOrgId())
                 .time(System.currentTimeMillis())
-                .heartbeatIntervalInMinutes(props.getHeartbeatInterval())
+                .heartbeatIntervalInMinutes(props.getHeartbeatIntervalInMinutes())
                 .username(props.getUsername())
                 .capabilities(props.adapterCapabilityToSet())
                 .build();
@@ -42,7 +43,7 @@ public class AdapterRegisterService {
                 .toBodilessEntity()
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(5))
                         .filter(throwable -> {
-                            log.error("Registration failed, retrying...", throwable);
+                            log.error("Registration failed, retrying... {}", errorDetails(throwable));
                             return true;
                         }))
                 .subscribe(response -> {
@@ -52,9 +53,16 @@ public class AdapterRegisterService {
                     } else {
                         log.error("Failed to register with code {}.", response.getStatusCode().value());
                     }
-                }, throwable -> log.error("Failed to register after retries.", throwable));
+                }, throwable -> log.error("Failed to register after retries: {}", errorDetails(throwable)));
 
         log.info("Keep on rocking in a free world ✌️🌻️🇺🇦!");
+    }
+
+    private String errorDetails(Throwable throwable) {
+        if (throwable instanceof WebClientResponseException exception && exception.getResponseBodyAsString().length() > 0) {
+            return "%s - response body: %s".formatted(exception.getMessage(), exception.getResponseBodyAsString());
+        }
+        return throwable.getMessage();
     }
 
 }
